@@ -217,7 +217,7 @@ function renderCard(){
     box.innerHTML = `
       <div class="kicker"><i style="background:${swatch}"></i>${esc(p.sys)}</div>
       <h2>${esc(p.name)}</h2>
-      <p class="pron">Say it: ${esc(p.pron)}</p>
+      <p class="pron">Say it: ${esc(p.pron)} ${speakBtn(p.pron)}</p>
       ${p.term?`<div class="term">Scientific name: ${esc(p.term)}</div>`:""}
       <div class="block"><h3>What is it?</h3><p>${esc(p.what)}</p></div>
       <div class="block"><h3>Where is it?</h3><p>${esc(p.where)}</p></div>
@@ -238,7 +238,7 @@ function renderCard(){
     box.innerHTML = `
       <div class="kicker">${esc(p.kind)}${p.group?` · ${esc(p.group)}`:""}</div>
       <h2>${esc(p.name)}</h2>
-      ${p.pron?`<p class="pron">Say it: ${esc(p.pron)}</p>`:""}
+      ${p.pron?`<p class="pron">Say it: ${esc(p.pron)} ${speakBtn(p.pron)}</p>`:""}
       ${p.term?`<div class="term">Scientific name: ${esc(p.term)}</div>`:""}
       <div class="block"><h3>What is it?</h3><p>${esc(p.what)}</p></div>
       ${p.fact?`<div class="callout fact"><b>Interesting fact:</b> ${esc(p.fact)}</div>`:""}
@@ -319,6 +319,28 @@ function setExploreStudy(which){
   if(three && window.init3D) window.init3D();
   if(!three && window.stop3D) window.stop3D();
 }
+
+/* ---------- pronunciation audio (device text-to-speech, works offline) ---------- */
+function speakBtn(pron){
+  if(!pron || !("speechSynthesis" in window)) return "";
+  return `<button class="speak" data-say="${esc(pron)}" aria-label="Hear how to say ${esc(pron)}" title="Hear it">&#9658; Listen</button>`;
+}
+function say(text){
+  if(!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(String(text).replace(/-/g," "));
+  u.lang = "en-IN"; u.rate = 0.8; u.pitch = 1;
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(x=>/en[-_](IN|GB|US)/i.test(x.lang));
+  if(v) u.voice = v;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-say]");
+  if(!b) return;
+  e.stopPropagation();
+  say(b.dataset.say);
+});
 
 /* ---------- init ---------- */
 function init(){

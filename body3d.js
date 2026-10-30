@@ -219,7 +219,7 @@ function infoHTML(id){
   const term = d.term ? `<div class="term">Scientific name: ${esc(d.term)}</div>` : "";
   return `
     <h3>${esc(d.name)}</h3>
-    ${d.pron?`<div class="pron">Say it: ${esc(d.pron)}</div>`:""}
+    ${d.pron?`<div class="pron">Say it: ${esc(d.pron)} ${speakBtn(d.pron)}</div>`:""}
     ${term}
     ${where}
     <h4>What does it do?</h4><p>${esc(fn)}</p>
